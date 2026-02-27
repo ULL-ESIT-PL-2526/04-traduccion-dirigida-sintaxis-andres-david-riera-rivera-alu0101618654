@@ -128,4 +128,12 @@ describe('Parser Tests', () => {
     });
   });
 
+  describe('Tests comentarios', () => {
+    test('salta comentarios en medio de la expresión', () => {
+      expect(parse("2 + 2 // suma")).toBe(4);
+      expect(parse("3 * 3 // multiplicación\n+ 1")).toBe(10);
+    });
+  });
+  
+
 });
