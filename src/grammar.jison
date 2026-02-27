@@ -3,6 +3,7 @@
 %%
 \s+                   { /* skip whitespace */; }
 "\/\/".*              { /* skip comment */; }
+[0-9]+"\."[0-9][0-9]([eE][+-][0-9]+)? { return 'FLOAT' }
 [0-9]+                { return 'NUMBER';       }
 "**"                  { return 'OP';           }
 [-+*/]                { return 'OP';           }
