@@ -134,6 +134,14 @@ describe('Parser Tests', () => {
       expect(parse("3 * 3 // multiplicación\n+ 1")).toBe(10);
     });
   });
-  
+
+  describe('Tests números flotantes', () => {
+    test('lee números flotantes', () => {
+      expect(parse("2.50 + 2.50")).toBe(5);
+      expect(parse("0.10e+0 * 10")).toBe(1);
+      expect(parse("0.10E+0 * 10")).toBe(1);
+    });
+  });
+
 
 });
