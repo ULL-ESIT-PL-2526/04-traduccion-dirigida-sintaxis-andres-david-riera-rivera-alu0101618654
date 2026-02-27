@@ -8,3 +8,4 @@ if (process.argv.length >2) {
 console.log(parse("1 - 2"));        // -1
 console.log(parse("10 - 4 - 3"));   // 3
 console.log(parse("7 - 5 - 1"));    // 1
+console.log(parse("123**45+@"));
