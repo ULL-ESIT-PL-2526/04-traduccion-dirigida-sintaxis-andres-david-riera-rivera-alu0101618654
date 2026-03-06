@@ -3,10 +3,11 @@
 %%
 \s+                   { /* skip whitespace */; }
 "//".*              { /* skip comment */; }
-[0-9]+\.[0-9][0-9]([eE][+-][0-9]+)? { return 'FLOAT' }
+[0-9]+\.[0-9]([0-9])?([eE][+-][0-9]+)? { return 'NUMBER' }
 [0-9]+                { return 'NUMBER';       }
-"**"                  { return 'OP';           }
-[-+*/]                { return 'OP';           }
+"**"                  { return 'OPOW';         }
+[-+]                  { return 'OPAD';         }
+[*/]                  { return 'OPMU';         }
 <<EOF>>               { return 'EOF';          }
 .                     { return 'INVALID';      }
 /lex
@@ -14,7 +15,6 @@
 /* Parser */
 %start expressions
 %token NUMBER
-%token FLOAT
 %%
 
 expressions
@@ -23,17 +23,32 @@ expressions
     ;
 
 expression
-    : expression OP term
-        { $$ = operate($OP, $expression, $term); }
+    : expression OPAD term
+        { $$ = operate($OPAD, $expression, $term); }
     | term
-        { $$ = $term; }
+        { $$ = $term; } 
     ;
 
 term
+    //: NUMBER
+      //  { $$ = Number(yytext); }
+    : term OPMU R
+        { $$ = operate($OPMU, $term, $R); }
+    | R
+        { $$ = $R; }
+    ;
+
+R
+    : F OPOW R
+        { $$ = operate($OPOW, $F, $R); }
+    | F
+        { $$ = $F; }
+    ;
+
+
+F
     : NUMBER
         { $$ = Number(yytext); }
-    | FLOAT
-        { $$ = parseFloat(yytext); }
     ;
 %%
 
