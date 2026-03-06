@@ -43,4 +43,12 @@ describe('Parser Failing Tests', () => {
     expect(parse("100 - 50 + 25")).toBe(75); // (100 - 50) + 25 = 75
     expect(parse("2 * 3 + 4 * 5")).toBe(26); // (2 * 3) + (4 * 5) = 26
   });
+
+  test('should handle various realistic calculations of floats with correct precedence', () => {
+    expect(parse("1.0 + 2.0 * 3.0")).toBe(7.0);
+    expect(parse("1.0 - 2.0 * 3.0")).toBe(-5.0);
+    expect(parse("6.0 / 1.5 + 4.5")).toBe(8.5);
+    expect(parse("2.0 ** 2.0 + 1.5")).toBe(5.5); 
+    expect(parse("2.0 ** 3.0 ** 2.0")).toBe(512.0); // 2.0 ** (3.0 ** 2.0) = 2.0 ** 9.0 = 512.0
+  });
 });
