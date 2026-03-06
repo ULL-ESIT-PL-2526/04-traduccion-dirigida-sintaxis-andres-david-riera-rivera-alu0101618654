@@ -103,9 +103,8 @@ describe('Tests comentarios', () => {
   });
 ```
 # Práctica 5
-## Preguntas
-### 1. Partiendo de la gramática y las siguientes frases 4.0-2.0*3.0, 2\*\*3\*\*2 y 7-4/2:
-1. Escriba la derivación para cada una de las frases.
+## 1. Partiendo de la gramática y las siguientes frases 4.0-2.0*3.0, 2\*\*3\*\*2 y 7-4/2:
+### 1.1 Escriba la derivación para cada una de las frases.
 
 **4.0 - 2.0 * 3.0**
 
@@ -119,7 +118,7 @@ expressions => expression EOF => expression OP[\*\*] term[2] => expression OP[\*
 
 expressions => expression EOF => expression OP[/] term[2] => expression OP[-] term[4] OP[/] term[2] => term[7] OP[-] term[4] OP[/] term[2]
 
-2. Escriba el árbol de análisis sintáctico (parse tree) para cada una de las frases.
+### 1.2 Escriba el árbol de análisis sintáctico (parse tree) para cada una de las frases.
 
 **4.0 - 2.0 * 3.0**
 
@@ -157,7 +156,114 @@ E - T - 2
     
     \ E - T - 7
 
-### 1.3. ¿En qué orden se evaluan las acciones semánticas para cada una de las frases?
+### 1.3 ¿En qué orden se evaluan las acciones semánticas para cada una de las frases?
 
 El orden se evalua de izquierda a derecha independientemente de las operaciones a realizar, esto se debe
 a la SDD.
+
+### 1.4 Añada un fichero prec.test.js al directorio __test__ con las siguientes pruebas y compruebe que con la implementación actual fallan.
+
+He añadido el fichero con el contenido indicado y he comprobado que fallan los tests.
+
+## 2. Modifique la gramática del fichero grammar.jison de manera que se respete la precedencia y la asociatividad de los operadores matemáticos.
+
+Actualicé el lexer con las nuevas expresiones regulares.
+
+```
+%lex
+%%
+\s+                   { /* skip whitespace */; }
+"//".*              { /* skip comment */; }
+[0-9]+\.[0-9]([0-9])?([eE][+-][0-9]+)? { return 'NUMBER' }
+[0-9]+                { return 'NUMBER';       }
+"**"                  { return 'OPOW';         }
+[-+]                  { return 'OPAD';         }
+[*/]                  { return 'OPMU';         }
+<<EOF>>               { return 'EOF';          }
+.                     { return 'INVALID';      }
+/lex
+```
+Y actualicé las reglas para respetar la precedencia y la asociatividad de los operadores matemáticos:
+```
+%start expressions
+%token NUMBER
+%%
+
+expressions
+    : expression EOF
+        { return $expression; }
+    ;
+
+expression
+    : expression OPAD term
+        { $$ = operate($OPAD, $expression, $term); }
+    | term
+        { $$ = $term; } 
+    ;
+
+term
+    //: NUMBER
+      //  { $$ = Number(yytext); }
+    : term OPMU R
+        { $$ = operate($OPMU, $term, $R); }
+    | R
+        { $$ = $R; }
+    ;
+
+R
+    : F OPOW R
+        { $$ = operate($OPOW, $F, $R); }
+    | F
+        { $$ = $F; }
+    ;
+
+
+F
+    : NUMBER
+        { $$ = Number(yytext); }
+    ;
+%%
+```
+
+## 3. Añada los test correspondientes para comprobar que se respeta la precedencia y asociatividad con flotantes.
+
+Añadí una prueba con varios test para comprobar que se respeta la precedencia y asociatividad con flotantes.
+
+```javascript
+test('should handle various realistic calculations of floats with correct precedence', () => {
+    expect(parse("1.0 + 2.0 * 3.0")).toBe(7.0);
+    expect(parse("1.0 - 2.0 * 3.0")).toBe(-5.0);
+    expect(parse("6.0 / 1.5 + 4.5")).toBe(8.5);
+    expect(parse("2.0 ** 2.0 + 1.5")).toBe(5.5); 
+    expect(parse("2.0 ** 3.0 ** 2.0")).toBe(512.0); // 2.0 ** (3.0 ** 2.0) = 2.0 ** 9.0 = 512.0
+  });
+```
+La gramática pasó el test con éxito.
+
+## 4. Modifique el programa Jison para que se reconozcan expresiones entre paréntesis.
+
+Añadí en el lexer las siguientes expresiones regulares
+```
+[(]                   { return '('; }
+[)]                   { return ')'; }
+```
+Y en el parser añadí la siguiente regla
+```
+F
+    : NUMBER
+        { $$ = Number(yytext); }
+    | '(' expression ')'
+        { $$ = $expression; }
+    ;
+%%
+```
+
+## 5. Añada los test correspondientes para las expresiones entre paréntesis.
+Añadí una prueba con varios test para comprobar que se le da prioridad a los paréntesis
+```javascript
+test('Parenthesis', () => {
+    expect(parse("(1 + 2) * 3")).toBe(9);
+    expect(parse("6 / (2 + 4)")).toBe(1); // 6 / (2 + 4) = 6 / (6) = 6 / 6 = 1
+  });
+```
+La gramática pasó el test con éxito.
