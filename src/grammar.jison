@@ -3,6 +3,8 @@
 %%
 \s+                   { /* skip whitespace */; }
 "//".*              { /* skip comment */; }
+[(]                   { return '('; }
+[)]                   { return ')'; }  
 [0-9]+\.[0-9]([0-9])?([eE][+-][0-9]+)? { return 'NUMBER' }
 [0-9]+                { return 'NUMBER';       }
 "**"                  { return 'OPOW';         }
@@ -49,6 +51,8 @@ R
 F
     : NUMBER
         { $$ = Number(yytext); }
+    | '(' expression ')'
+        { $$ = $expression; }
     ;
 %%
 

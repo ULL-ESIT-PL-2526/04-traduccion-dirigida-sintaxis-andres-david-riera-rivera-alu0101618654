@@ -51,4 +51,9 @@ describe('Parser Failing Tests', () => {
     expect(parse("2.0 ** 2.0 + 1.5")).toBe(5.5); 
     expect(parse("2.0 ** 3.0 ** 2.0")).toBe(512.0); // 2.0 ** (3.0 ** 2.0) = 2.0 ** 9.0 = 512.0
   });
+
+  test('Parenthesis', () => {
+    expect(parse("(1 + 2) * 3")).toBe(9);
+    expect(parse("6 / (2 + 4)")).toBe(1); // 6 / (2 + 4) = 6 / (6) = 6 / 6 = 1
+  });
 });
