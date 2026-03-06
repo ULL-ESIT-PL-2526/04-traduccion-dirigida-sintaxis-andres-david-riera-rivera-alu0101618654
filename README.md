@@ -29,3 +29,5 @@ Type ".help" for more information.
 > p.parse("2*3")
 6
 ```
+# Informe
+[enlace al informe](https://github.com/ULL-ESIT-PL-2526/04-traduccion-dirigida-sintaxis-andres-david-riera-rivera-alu0101618654/blob/48c48a366d3e1239e358cb32ebda6a02adf1cf65/README.md)
